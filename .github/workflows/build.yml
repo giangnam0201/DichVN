@@ -1,0 +1,116 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+
+      - run: flutter build web --release
+
+      - name: Zip web build
+        run: |
+          cd build/web
+          zip -r ../../dichvn-web.zip .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: dichvn-web.zip
+
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+
+      - run: flutter build apk --release --no-tree-shake-icons
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+
+      - run: flutter build windows --release --no-tree-shake-icons
+
+      - name: Zip Windows build
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath dichvn-windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: dichvn-windows.zip
+
+  create-release:
+    needs: [build-web, build-android, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: release-artifacts
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-build
+          path: release-artifacts
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: release-artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          body: |
+            Automated release from CI build #${{ github.run_number }}
+
+            ## Downloads
+            - **Web**: dichvn-web.zip
+            - **Android**: app-release.apk
+            - **Windows**: dichvn-windows.zip
+          files: |
+            release-artifacts/dichvn-web.zip
+            release-artifacts/app-release.apk
+            release-artifacts/dichvn-windows.zip
+          draft: false
+          prerelease: false

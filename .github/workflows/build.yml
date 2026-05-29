@@ -45,41 +45,38 @@ jobs:
         with:
           channel: stable
 
-      - name: Generate fresh Android platform files
+      - name: Setup Android project
         run: |
           rm -rf android/
           flutter create --platforms=android --org=com.example .
-
-      - name: Add RECORD_AUDIO permission
-        run: |
-          sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n</manifest>|' android/app/src/main/AndroidManifest.xml
-
-      - name: Fix subproject compileSdk for plugin compatibility
-        run: |
-          cat >> android/build.gradle << 'EOF'
-
-          subprojects {
-              afterEvaluate { project ->
-                  if (project.hasProperty('android')) {
-                      project.android {
-                          if (namespace == null) {
-                              namespace = project.group.toString()
-                          }
-                          compileSdk = 36
-                      }
-                  }
-              }
-          }
-          EOF
+          # Add RECORD_AUDIO and INTERNET permissions
+          sed -i 's|<application|<uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.INTERNET"/>\n\n    <application|' android/app/src/main/AndroidManifest.xml
 
       - run: flutter pub get
 
-      - run: flutter build apk --release --no-tree-shake-icons
+      - run: flutter build apk --release
+
+      - name: Find and copy APK
+        run: |
+          echo "Looking for APK files..."
+          find build/ -name "*.apk" -type f 2>/dev/null || true
+          APK_PATH=$(find build/ -name "app-release.apk" -type f 2>/dev/null | head -1)
+          if [ -z "$APK_PATH" ]; then
+            echo "app-release.apk not found, looking for any release apk..."
+            APK_PATH=$(find build/ -name "*release*.apk" -type f 2>/dev/null | head -1)
+          fi
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK found!"
+            find build/ -type f | head -50
+            exit 1
+          fi
+          echo "Found APK at: $APK_PATH"
+          cp "$APK_PATH" ./dichvn-android.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: android-build
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: dichvn-android.apk
 
   build-windows:
     runs-on: windows-latest
@@ -95,7 +92,7 @@ jobs:
 
       - run: flutter pub get
 
-      - run: flutter build windows --release --no-tree-shake-icons
+      - run: flutter build windows --release
 
       - name: Zip Windows build
         run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath dichvn-windows.zip
@@ -136,11 +133,11 @@ jobs:
 
             ## Downloads
             - **Web**: dichvn-web.zip
-            - **Android**: app-release.apk
+            - **Android**: dichvn-android.apk
             - **Windows**: dichvn-windows.zip
           files: |
             release-artifacts/dichvn-web.zip
-            release-artifacts/app-release.apk
+            release-artifacts/dichvn-android.apk
             release-artifacts/dichvn-windows.zip
           draft: false
           prerelease: false

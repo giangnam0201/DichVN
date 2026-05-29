@@ -54,6 +54,24 @@ jobs:
         run: |
           sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n</manifest>|' android/app/src/main/AndroidManifest.xml
 
+      - name: Fix subproject compileSdk for plugin compatibility
+        run: |
+          cat >> android/build.gradle << 'EOF'
+
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      project.android {
+                          if (namespace == null) {
+                              namespace = project.group.toString()
+                          }
+                          compileSdk = 36
+                      }
+                  }
+              }
+          }
+          EOF
+
       - run: flutter pub get
 
       - run: flutter build apk --release --no-tree-shake-icons

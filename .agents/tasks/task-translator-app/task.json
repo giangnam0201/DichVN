@@ -1,0 +1,7 @@
+{
+  "task_id": "task-translator-app",
+  "task_description": "Create a Flutter translator app with speech-to-text, text-to-speech, and MyMemory translation API integration. Beautiful Material Design 3 UI with large speak button. CI/CD via GitHub Actions building for Web, Android, and Windows with automatic releases.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}

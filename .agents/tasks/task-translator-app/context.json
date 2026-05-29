@@ -1,0 +1,26 @@
+{
+  "project_type": "Flutter cross-platform translator app",
+  "language": "Dart",
+  "build_system": "Flutter SDK with pub for dependencies",
+  "test_framework": "flutter_test (widget tests)",
+  "build_command": "flutter build web && flutter build apk --release && flutter build windows --release",
+  "test_command": "flutter test",
+  "verification_instructions": "1. Install Flutter SDK, 2. Run flutter pub get, 3. Run flutter test, 4. Build for web/android/windows",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "1. Install Flutter SDK via git clone, 2. Add to PATH, 3. Run flutter doctor, 4. Run flutter pub get",
+  "environment_constraints": "Flutter is NOT pre-installed. Must install via git clone from stable channel. Open internet available for package downloads. Android SDK needed for APK builds (will be handled in CI). Windows build needs Visual Studio (handled in CI).",
+  "contribution_requirements": "Push directly to main branch. Use git username giangnam0201.",
+  "key_patterns": "Flutter Material Design 3, provider or setState for state management, http package for API calls, MyMemory Translation API (free, no key needed)",
+  "relevant_files": [
+    "lib/main.dart",
+    "lib/screens/translator_screen.dart",
+    "lib/services/translation_service.dart",
+    "lib/services/tts_service.dart",
+    "lib/models/language.dart",
+    "lib/widgets/speak_button.dart",
+    "lib/widgets/language_selector.dart",
+    "pubspec.yaml",
+    ".github/workflows/build.yml"
+  ],
+  "directory_structure": "Standard Flutter project: lib/ for source, test/ for tests, android/ for Android config, web/ for web config, windows/ for Windows config, .github/workflows/ for CI/CD"
+}

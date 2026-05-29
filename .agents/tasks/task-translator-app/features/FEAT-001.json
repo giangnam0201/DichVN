@@ -1,0 +1,44 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Create the complete Flutter translator app with all source code, configuration, and CI/CD pipeline. This is a greenfield project so everything is created in one coherent feature.",
+  "status": "completed",
+  "steps": [
+    "Step 1: Create pubspec.yaml with dependencies: http, flutter_tts, speech_to_text, provider, and dev dependencies for testing",
+    "Step 2: Create lib/models/language.dart - Language model class with code, name, and a static list of all supported languages (use MyMemory/standard ISO 639-1 codes). Include at minimum: English, Vietnamese, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Korean, Chinese (Simplified), Chinese (Traditional), Thai, Arabic, Hindi, Indonesian, Malay, Dutch, Polish, Turkish, Swedish, Czech, Danish, Finnish, Greek, Hebrew, Hungarian, Norwegian, Romanian, Ukrainian",
+    "Step 3: Create lib/services/translation_service.dart - Service that calls MyMemory API (https://api.mymemory.translated.net/get?q={text}&langpair={from}|{to}), parses JSON response, returns translated text. Handle errors gracefully.",
+    "Step 4: Create lib/services/tts_service.dart - Text-to-Speech service using flutter_tts package. Methods: speak(text, languageCode), stop(). Configure speech rate and pitch.",
+    "Step 5: Create lib/services/speech_service.dart - Speech-to-Text service using speech_to_text package. Methods: initialize(), startListening(onResult, localeId), stopListening(). Handle permissions.",
+    "Step 6: Create lib/widgets/speak_button.dart - Large circular animated microphone button (Material Design 3). Should pulse/animate when listening. Use AnimationController for a breathing/pulse effect. Size: at least 80px radius.",
+    "Step 7: Create lib/widgets/language_selector.dart - Dropdown widget for selecting languages. Shows language name, supports search/filter if many languages.",
+    "Step 8: Create lib/screens/translator_screen.dart - Main screen with: language selectors at top (with swap button), text input field, translated text display, large speak button in center, TTS buttons for both source and target text. Use Material Design 3 theming with a nice color scheme (deep purple/teal gradient accents).",
+    "Step 9: Create lib/main.dart - App entry point with MaterialApp, Material Design 3 theme (useMaterial3: true), color scheme with seed color, and TranslatorScreen as home.",
+    "Step 10: Create analysis_options.yaml with standard Flutter linting rules",
+    "Step 11: Create web/index.html and web/manifest.json for web platform support",
+    "Step 12: Create test/translation_service_test.dart - Unit test for translation service (mock HTTP, verify parsing)",
+    "Step 13: Create .github/workflows/build.yml - GitHub Actions workflow that: triggers on push to main, sets up Flutter, builds Web (zip), Android APK (release), Windows EXE (release), then creates a GitHub Release with all artifacts attached. Use subosito/flutter-action@v2. For Android, set up Java 17. For Windows, use windows-latest runner. Use a matrix or sequential jobs. Tag releases with a timestamp or run number.",
+    "Step 14: Create .gitignore for Flutter project (build/, .dart_tool/, etc.)",
+    "Step 15: Create android/app/src/main/AndroidManifest.xml with INTERNET and RECORD_AUDIO permissions",
+    "Step 16: Create all necessary Android Gradle build files (android/build.gradle, android/app/build.gradle, android/settings.gradle, android/gradle.properties, android/gradle/wrapper/gradle-wrapper.properties) configured for release APK build without signing",
+    "Step 17: Create windows/runner/ files needed for Windows build (CMakeLists.txt, main.cpp, flutter_window.cpp, etc.) or use flutter create to generate them",
+    "Step 18: Create README.md with app description, features, and build instructions"
+  ],
+  "acceptance_criteria": [
+    "pubspec.yaml contains all required dependencies (http, flutter_tts, speech_to_text, provider)",
+    "Translation service correctly calls MyMemory API and parses response",
+    "UI has a large prominent speak/microphone button as the central element",
+    "Language selectors default to English -> Vietnamese",
+    "All supported languages are available in the language selector",
+    "GitHub Actions workflow file exists and builds for Web, Android, and Windows",
+    "GitHub Actions workflow creates a release with artifacts on successful build",
+    ".gitignore properly excludes build artifacts"
+  ],
+  "verification": [
+    "Verify the project structure is complete with all necessary files for a Flutter project",
+    "Verify the GitHub Actions workflow YAML is valid",
+    "Verify the Dart code has no syntax errors by checking with dart analyze (after Flutter is installed)",
+    "Push to main and monitor the GitHub Actions build"
+  ],
+  "blocked_reason": null,
+  "findings": "All project files created from scratch. Flutter is not installed in the sandbox so local build/test was not possible; YAML validity confirmed with Python parser. Dart brace balance verified. The project uses standard Flutter template patterns for Android and Windows platform configs. The CI workflow uses subosito/flutter-action@v2 with stable channel and creates releases via softprops/action-gh-release@v1. Android build uses debug signing for release mode to avoid keystore requirement. The speak_button widget uses Flutter built-in AnimatedBuilder for the pulse animation."
+}

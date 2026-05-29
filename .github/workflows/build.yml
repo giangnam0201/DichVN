@@ -45,13 +45,16 @@ jobs:
         with:
           channel: stable
 
-      - run: flutter pub get
+      - name: Generate fresh Android platform files
+        run: |
+          rm -rf android/
+          flutter create --platforms=android --org=com.example .
 
       - name: Add RECORD_AUDIO permission
         run: |
-          # Add RECORD_AUDIO permission to the AndroidManifest.xml after flutter create generates it
           sed -i 's|</manifest>|    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n</manifest>|' android/app/src/main/AndroidManifest.xml
-          cat android/app/src/main/AndroidManifest.xml
+
+      - run: flutter pub get
 
       - run: flutter build apk --release --no-tree-shake-icons
 
